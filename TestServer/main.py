@@ -3,7 +3,7 @@ import socket
 PORT: int = 4200
 IP: str = "127.0.0.1"
 
-def main():
+def test1():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(((IP,PORT)))
     csv_path = "dado1.csv"
@@ -12,4 +12,4 @@ def main():
     
 
 if __name__ == "__main__":
-    main()
+    test1()

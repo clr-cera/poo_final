@@ -30,6 +30,12 @@ class Client:
                 command: str = message.decode()
                 self.ParseCommand(command)
 
+            if not message:
+                print(f"Closed connection with {self.addr}")
+                self.sock.close()
+                self.process.kill()
+                exit()
+
         except:
             pass
     
@@ -43,7 +49,7 @@ class Client:
                 print("Operation 1")
                 self.load_csv(arguments)
         
-        out, err = self.process.communicate()
+        out, _ = self.process.communicate()
 
         print(out.decode())
 
