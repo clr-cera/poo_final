@@ -22,6 +22,26 @@ def test2(s: socket.socket):
     output = output.replace("\\n", "\n")
     print(output)
 
+def test3(s: socket.socket):
+    s.sendall("3 2 nomeClube \"EINTRACHT FRANKFURT\" nacionalidade \"AUSTRALIA\"".encode())
+    
+    output = listen_returnal(s)
+    output = output.replace("\\n", "\n")
+    print(output)
+
+def test5(s: socket.socket):
+    s.sendall("5 2 nomeClube \"EINTRACHT FRANKFURT\" nacionalidade \"AUSTRALIA\"".encode())
+    
+    output = listen_returnal(s)
+    output = output.replace("\\n", "\n")
+    print(output)
+
+def test6(s: socket.socket):
+    s.sendall("6 -50 21 \"GABRIELZINHO\" \"QUEPAPO\" \"ISSO AI\"".encode())
+    
+    output = listen_returnal(s)
+    output = output.replace("\\n", "\n")
+    print(output)
 
 def listen_returnal(s: socket.socket) -> str:
     string: str = ""
@@ -70,5 +90,11 @@ def listen_returnal(s: socket.socket) -> str:
 if __name__ == "__main__":
     test1(s)
     sleep(0.1)
+    #test5(s)
+    #sleep(0.1)
+    test6(s)
+    sleep(0.1)
     test2(s)
     sleep(0.1)
+    #test3(s)
+    #sleep(0.1)

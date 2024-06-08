@@ -52,12 +52,22 @@ class Client:
             case '1':
                 print(f"Loading csv for {self.addr}.{self.identifier}")
                 self.load_csv(arguments)
+
             case '2':
                 print(f"Searching all registers for {self.addr}.{self.identifier}") 
                 self.search_all()
 
             case '3':
                 print(f"Searching registers with filter for {self.addr}.{self.identifier}")
+                self.search_filter(arguments)
+            
+            case '5':
+                print(f"Removing registers with filter for {self.addr}.{self.identifier}")
+                self.remove_filter(arguments)
+
+            case '6':
+                print(f"Inserting register for {self.addr}.{self.identifier}")
+                self.insert_register(arguments)
 
         out, _ = self.process.communicate()
         output = str(out)
@@ -82,6 +92,18 @@ class Client:
 
     def search_all(self):
         self.process.stdin.write(f"2 {self.file_name}\n".encode())
+
+    def search_filter(self, arguments: list[str]):
+        self.process.stdin.write(f"3 {self.file_name} 1\n".encode())
+        self.process.stdin.write((' '.join(arguments) + "\n").encode())
+
+    def remove_filter(self, arguments: list[str]):
+        self.process.stdin.write(f"5 {self.file_name} {f'{self.addr}.{self.identifier}.index.bin'} 1\n".encode())
+        self.process.stdin.write((' '.join(arguments) + "\n").encode())
+
+    def insert_register(self, arguments: list[str]):
+        self.process.stdin.write(f"6 {self.file_name} {f'{self.addr}.{self.identifier}.index.bin'} 1\n".encode())
+        self.process.stdin.write((' '.join(arguments) + "\n").encode())
 
     def send_back(self, output: str):
         output = f"{len(output)} " + output
