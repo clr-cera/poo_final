@@ -15,7 +15,6 @@ class Client:
         self.addr = addr
         self.identifier = identifier
         self.file_name = addr + f".{self.identifier}"+ ".bin"
-        self.process = subprocess.Popen(["./Arquivos/main"],stdin=subprocess.PIPE)
         pass
 
     def __call__(self) -> Any:
@@ -30,11 +29,12 @@ class Client:
                 command: str = message.decode()
                 self.ParseCommand(command)
 
+            
             if not message:
                 print(f"Closed connection with {self.addr}")
                 self.sock.close()
-                self.process.kill()
                 exit()
+            
 
         except:
             pass
@@ -42,20 +42,47 @@ class Client:
     def ParseCommand(self, command: str):
         comList: list[str] = command.split()
         number: str = comList[0]
+        print(number)
         arguments: list[str] = comList[1:]
+
+        self.process = subprocess.Popen(["./Arquivos/main"],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+
 
         match number:
             case '1':
-                print("Operation 1")
+                print(f"Loading csv for {self.addr}.{self.identifier}")
                 self.load_csv(arguments)
-        
-        out, _ = self.process.communicate()
+            case '2':
+                print(f"Searching all registers for {self.addr}.{self.identifier}") 
+                self.search_all()
 
-        print(out.decode())
+            case '3':
+                print(f"Searching registers with filter for {self.addr}.{self.identifier}")
+
+        out, _ = self.process.communicate()
+        output = str(out)
+        output = output[2:len(output)-3]
+
+        print(output)
+
+        try:
+            self.send_back(output)
+        except Exception as e:
+            print(e)
+
+        self.process.kill()
+         
 
 
     def load_csv(self, arguments: list[str]):
         if len(arguments) == 0:
             return
         csv_path = arguments[0]
-        self.process.stdin.write(f"1 {csv_path} {self.file_name}".encode()) 
+        self.process.stdin.write(f"1 {csv_path} {self.file_name}\n".encode()) 
+
+    def search_all(self):
+        self.process.stdin.write(f"2 {self.file_name}\n".encode())
+
+    def send_back(self, output: str):
+        output = f"{len(output)} " + output
+        self.sock.sendall(output.encode())
