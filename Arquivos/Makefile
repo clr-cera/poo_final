@@ -1,5 +1,6 @@
 all: main.o funcoes_fornecidas.o functionalities.o header.o register.o tools.o index.o
 	gcc main.o funcoes_fornecidas.o functionalities.o header.o register.o tools.o index.o -o main -std=c99 -Wall -g
+	rm *.o
 
 main.o:
 	gcc -c main.c -o main.o -g

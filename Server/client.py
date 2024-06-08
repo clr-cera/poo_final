@@ -8,11 +8,13 @@ class Client:
     addr: str
     file_name: str
     process: subprocess.Popen
+    identifier: int
 
-    def __init__(self, sock: socket, addr: str) -> None:
+    def __init__(self, sock: socket, addr: str, identifier: int) -> None:
         self.sock = sock
         self.addr = addr
-        self.file_name = addr + ".bin"
+        self.identifier = identifier
+        self.file_name = addr + f".{self.identifier}"+ ".bin"
         self.process = subprocess.Popen(["./Arquivos/main"],stdin=subprocess.PIPE)
         pass
 
@@ -38,12 +40,16 @@ class Client:
 
         match number:
             case '1':
+                print("Operation 1")
                 self.load_csv(arguments)
+        
+        out, err = self.process.communicate()
+
+        print(out.decode())
 
 
     def load_csv(self, arguments: list[str]):
         if len(arguments) == 0:
             return
         csv_path = arguments[0]
-        self.process.stdin.write(f"1 {csv_path} {self.file_name}".encode())
-        
+        self.process.stdin.write(f"1 {csv_path} {self.file_name}".encode()) 

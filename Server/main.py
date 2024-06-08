@@ -10,7 +10,7 @@ def main():
 
 def test():
     process = subprocess.Popen(["./Arquivos/main"],stdin=subprocess.PIPE)
-    csv_path = "Jogador.csv"
+    csv_path = "dado1.csv"
     process.stdin.write(f"1 {csv_path} test.bin".encode())
 
 
