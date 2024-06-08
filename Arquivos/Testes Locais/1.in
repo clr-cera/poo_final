@@ -1,0 +1,12 @@
+1 Dados.csv Dados.bin
+5 Dados.bin Indice.bin 3
+1 nacionalidade "RUSSIA"
+1 id 2
+2 nomeJogador "HAPS" id 4
+2 Dados.bin
+6 Dados.bin Indice.bin 4
+1 24 "FOMIN" "RUSSIA" NULO
+2 21 "BERNABEI" "ARGENTINA" "CELTIC"
+3 29 "HAPS" "SURINAME" "VENEZIA FC"
+4 30 "GUSTAVO VIERA FERREIRA" "BRAZIL" "MO FC"
+2 Dados.bin

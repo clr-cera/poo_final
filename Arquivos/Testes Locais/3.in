@@ -1,0 +1,10 @@
+1 Dados.csv Dados.bin
+5 Dados.bin Indice.bin 4
+1 id 4
+1 id 3
+1 id 2
+1 id 1
+6 Dados.bin Indice.bin 2
+5 NULO "ALAN" NULO "FC"
+6 32 "FELIPE" "MATO GROSSO" "M"
+2 Dados.bin
