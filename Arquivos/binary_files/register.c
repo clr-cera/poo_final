@@ -117,7 +117,8 @@ void Print_Player(PLAYER *player) {
   if (player->club_size == 0) {
     strcpy(player->name_club, "SEM DADO");
   }
-  // printf("ID: %d\n", player->id);
+   printf("ID: %d\n", player->id);
+   printf("Idade: %d\n", player->age);
   printf("Nome do Jogador: %s\n", player->player_name);
   printf("Nacionalidade do Jogador: %s\n", player->nationality);
   printf("Clube do Jogador: %s\n\n", player->name_club);
