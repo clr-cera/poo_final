@@ -117,11 +117,11 @@ void Print_Player(PLAYER *player) {
   if (player->club_size == 0) {
     strcpy(player->name_club, "SEM DADO");
   }
-   printf("ID: %d\n", player->id);
-   printf("Idade: %d\n", player->age);
-  printf("Nome do Jogador: %s\n", player->player_name);
-  printf("Nacionalidade do Jogador: %s\n", player->nationality);
-  printf("Clube do Jogador: %s\n\n", player->name_club);
+  printf("%d\n", player->id);
+  printf("%d\n", player->age);
+  printf("%s\n", player->player_name);
+  printf("%s\n", player->nationality);
+  printf("%s\n\n", player->name_club);
 }
 
 // Read a player from a file.bin and stores it on a struct and return the struct

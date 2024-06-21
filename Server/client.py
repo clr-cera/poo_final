@@ -106,5 +106,5 @@ class Client:
         self.process.stdin.write((' '.join(arguments) + "\n").encode())
 
     def send_back(self, output: str):
-        output = f"{len(output)} " + output
-        self.sock.sendall(output.encode())
+        length: int = len(output)
+        self.sock.sendall(length.to_bytes(length=4, byteorder= "big") + output.encode())
