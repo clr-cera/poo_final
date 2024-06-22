@@ -70,14 +70,32 @@ public class SockInter {
         return Register.readMultipleRegisters(response);
     }
 
-    public void remove(Register filter) {
+    public boolean remove(Register filter) {
         sendMessage("5 " + filter.toFilter());
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            text = text.replace("\\n", "\n");
+            String[] splitted = text.split("\n");
+            float _ = Float.parseFloat(splitted[0]);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
-    public void insert(Register reg) {
+    public boolean insert(Register reg) {
         sendMessage("6 " + reg.toRegInput());
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            text = text.replace("\\n", "\n");
+            String[] splitted = text.split("\n");
+            float _ = Float.parseFloat(splitted[0]);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public void close() {
