@@ -41,9 +41,16 @@ public class SockInter {
         }
     }    
 
-    public void createTable(String csv_path) {
+    public boolean createTable(String csv_path) {
         sendMessage("1 " + csv_path);
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            float _ = Float.parseFloat(text);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public LinkedList<Register> searchAll() {
