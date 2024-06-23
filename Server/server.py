@@ -3,6 +3,7 @@ from typing import Any
 import socket
 from time import sleep
 from client import Client
+import subprocess
 
 class Server:
     threadsList: list[Thread] = []
@@ -11,6 +12,8 @@ class Server:
 
     def __init__(self, ip: str, port: int) -> None:
         self.serverSocket = Server.CreateServerSocket(ip, port)
+        self.process = subprocess.Popen(["make","-C","./Arquivos"])
+        
     
     def CreateServerSocket(ip: str, port: int) -> socket.socket:
         s: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
