@@ -10,7 +10,16 @@ public class SockInter {
     private PrintWriter out;
     private DataInputStream in;
 
-    SockInter() {
+    public static void main(String[] args) {
+        SockInter sock = new SockInter();
+        sock.createTable("dado1.csv");    
+        Register filter = new Register();
+        filter.name = "K. DE BRUYNElal";
+
+        sock.searchAllFilter(filter);
+    }
+
+    public SockInter() {
         try {
             this.socket = new Socket("127.0.0.1", 4200);
             this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -58,7 +67,12 @@ public class SockInter {
         String response = receiveMessage();
         
         response = response.replace("\\n", "\n");
-        return Register.readMultipleRegisters(response);
+        try {
+            return Register.readMultipleRegisters(response);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public LinkedList<Register> searchAllFilter(Register filter) {
@@ -67,7 +81,12 @@ public class SockInter {
 
         response = response.replace("\\n", "\n");
         response = response.substring(response.indexOf("\n")+2);
-        return Register.readMultipleRegisters(response);
+        try {
+            return Register.readMultipleRegisters(response);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean remove(Register filter) {
