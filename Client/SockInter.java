@@ -10,7 +10,7 @@ public class SockInter {
     private PrintWriter out;
     private DataInputStream in;
 
-    SockInter() {
+    public SockInter() {
         try {
             this.socket = new Socket("127.0.0.1", 4200);
             this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -27,7 +27,16 @@ public class SockInter {
     }
 
     private String receiveMessage() {
-        try { 
+        try {
+            Thread.sleep(500);
+        }catch(InterruptedException e){
+            System.out.println("eu odeio java com cada fibra do meu ser.");
+        }
+        try {
+            if(in.available() == 0){
+                System.out.println("servidor nao postou nada");
+                return null;
+            }
             int len = in.readInt();
             byte[] bytes = new byte[len];
             in.readFully(bytes);
@@ -39,10 +48,12 @@ public class SockInter {
             System.out.println("Error receiving message: " + e.getMessage());
             return null;
         }
-    }    
+    }
 
     public void createTable(String csv_path) {
+        System.out.println("enviando mensagem para server, csv_path is "+ csv_path);
         sendMessage("1 " + csv_path);
+        System.out.println("mensagem enviada, aguardando retorno");
         receiveMessage();
     }
 

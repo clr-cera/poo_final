@@ -31,7 +31,7 @@ public class Register {
             reg.team = lines[4];
 
             list.addLast(reg);
-            System.out.println(reg.toRegInput());
+            //System.out.println(reg.toRegInput());
         }
 
         return list;
@@ -40,11 +40,11 @@ public class Register {
     public String toString() {
         String string = "";
 
-        string += id      + "\n";
-        string += age     + "\n";
-        string += name    + "\n";
-        string += country + "\n";
-        string += team    + "\n";
+        string += id      + " | ";
+        string += age     + " | ";
+        string += name    + " | ";
+        string += country + " | ";
+        string += team;
 
         return string;
     }
