@@ -50,11 +50,16 @@ public class SockInter {
         }
     }
 
-    public void createTable(String csv_path) {
-        System.out.println("enviando mensagem para server, csv_path is "+ csv_path);
+    public boolean createTable(String csv_path) {
         sendMessage("1 " + csv_path);
-        System.out.println("mensagem enviada, aguardando retorno");
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            float _ = Float.parseFloat(text);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public LinkedList<Register> searchAll() {
@@ -62,7 +67,12 @@ public class SockInter {
         String response = receiveMessage();
         
         response = response.replace("\\n", "\n");
-        return Register.readMultipleRegisters(response);
+        try {
+            return Register.readMultipleRegisters(response);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public LinkedList<Register> searchAllFilter(Register filter) {
@@ -71,17 +81,40 @@ public class SockInter {
 
         response = response.replace("\\n", "\n");
         response = response.substring(response.indexOf("\n")+2);
-        return Register.readMultipleRegisters(response);
+        try {
+            return Register.readMultipleRegisters(response);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
-    public void remove(Register filter) {
+    public boolean remove(Register filter) {
         sendMessage("5 " + filter.toFilter());
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            text = text.replace("\\n", "\n");
+            String[] splitted = text.split("\n");
+            float _ = Float.parseFloat(splitted[0]);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
-    public void insert(Register reg) {
+    public boolean insert(Register reg) {
         sendMessage("6 " + reg.toRegInput());
-        receiveMessage();
+        String text = receiveMessage();
+        try {
+            text = text.replace("\\n", "\n");
+            String[] splitted = text.split("\n");
+            float _ = Float.parseFloat(splitted[0]);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public void close() {
