@@ -73,7 +73,6 @@ class Client:
         output = str(out)
         output = output[2:len(output)-3]
 
-        print(output)
 
         try:
             self.send_back(output)

@@ -1,5 +1,5 @@
 run_server:
-	python Server/main.py
+	python3 Server/main.py
 
 run_client:
 	javac Client/*.java
