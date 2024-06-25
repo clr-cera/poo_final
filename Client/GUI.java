@@ -11,11 +11,11 @@ import java.util.Iterator;
 public class GUI {
     private JFrame frame; //janela principal
     private InputPanel inputPanel;
-    public JPanel cardPanel; //objeto pra alternar entre visualizavao de um player e a tabela scrollable com varios
+    public JPanel cardPanel; //objeto pra alternar entre visualizacao de um player e a tabela scrollable com varios
 
-    //polish esses booleano devia ser private e com getter
+    
     public boolean dataBaseLoaded = false;
-    //public boolean inLoop = false;
+   
     public static final char PESQUISA = 0;
     public static final char EDICAO = 1;
     public static final char DELECAO = 2;
@@ -27,19 +27,17 @@ public class GUI {
         reset();
     }
 
-    //funcao que povoa o GUI e, em teoria, fecha outras janelas
+    //funcao que povoa o GUI e fecha outras janelas
     public void reset(){
         if(dataBaseLoaded){
             this.frame.dispose();
-            //polish resolver o problema que eu mostrei na call
-            //if(this.inputPanel.playerDisplay != null && this.inputPanel.playerDisplay.auxiliarWindow.isShowing())
-            //    this.inputPanel.playerDisplay.auxiliarWindow.dispose();
+            
         }
         //cria e seta a janela
         frame = new JFrame("Input Panel");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000, 600);
-        //adiciona a variavel la de card à janela
+        //adiciona a variavel de card à janela
         cardPanel = new JPanel(new CardLayout());
 
         YearMenu yearMenu = new YearMenu();
@@ -69,7 +67,7 @@ public class GUI {
                         JOptionPane.showMessageDialog(null, "Ano " + yearItem.getText() + " selecionado. Carregando dados");
                         if(dataBaseLoaded)
                             reset();
-                        //polish fingir que tem mais de um ano, talvez mudar o arquivo usado
+                        
                         dataBaseLoaded = loadData("dado1.csv");
                     }
                 });
@@ -89,9 +87,9 @@ public class GUI {
                     }
 
                     JTextArea textArea = new JTextArea(massiveFuckingString.toString());
-                    textArea.setEditable(false);  // Make the text area non-editable
-                    textArea.setLineWrap(true);   // Enable line wrapping
-                    textArea.setWrapStyleWord(true);  // Wrap at word boundaries
+                    textArea.setEditable(false);  // torna a area de texto nao editável
+                    textArea.setLineWrap(true);   // permite line wrapping
+                    textArea.setWrapStyleWord(true);  // Wrap no limite das palavras
 
                     JScrollPane scrollPane = new JScrollPane(textArea);
 
@@ -111,7 +109,7 @@ public class GUI {
         }
 
         private boolean loadData(String path_to_csv){
-            //polish verificar se deu certo, de ALGUMA MANEIRA que eu nao sei como
+            
             interactiveSocket.createTable(path_to_csv);
             return true;
         }
@@ -144,12 +142,7 @@ public class GUI {
 
         public PlayerDisplay(LinkedList<Register> players, Timer timer){
             auxiliarWindow = new JFrame();
-            /*ActionListener taskPerformer = new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    System.out.println("refresh");
-                }
-            };
-            new Timer(100, taskPerformer).start();*/
+           
             render(players, timer);
         }
 
@@ -169,19 +162,18 @@ public class GUI {
                 public void actionPerformed(ActionEvent e){
                     if(!auxiliarWindow.isShowing()){
                         auxiliarWindow.setSize(900, 540);
-                        //auxiliarWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                       
                         auxiliarWindow.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosing(WindowEvent e) {
-                                // Perform action in the parent frame when child frame is closing
+                                
                                 System.out.println("Child frame is closing. Perform action in parent frame.");
-                                // For example, change the parent frame's title
-                                //parentFrame.setTitle("Child Frame Closed");
+                                
                             }
                         });
                         int playerLLId = ((PlayerButton) e.getSource()).getLLIndex();
                         Register playerTemp = displayGetRegister(playerLLId);
-                        //System.out.println(playerTemp.toString());
+                        
                         String[] stringAux = {String.valueOf(playerTemp.id), String.valueOf(playerTemp.age), playerTemp.name, playerTemp.country, playerTemp.team};
                         InputPanel localInputPanel = new InputPanel(stringAux, EDICAO);
                         auxiliarWindow.add(localInputPanel);
@@ -211,7 +203,7 @@ public class GUI {
             add(goBackButton);
         }
         
-        //apen criar uma funcao para editar o conteudo de um jogador em players ou pra apagar ele, se nao a copia local dos dados fica diferente da copia em "memoria secundaria"
+        
     }
 
     //tabela com os dados de um jogador. Vazia para buscas, preenchida parcial ou totalmente quando associada a um jogador presente na lista
@@ -229,14 +221,14 @@ public class GUI {
 
         private PlayerDisplay playerDisplay = null;
 
-        private int actualOperation;//porque java nao me deixa fazer uma maquina de estados simples sem ser um pe no saco
+        private int actualOperation;
 
         //TODO: mudar de receber um array de strings pra receber um Register vazio
         public InputPanel(String[] values, char operation) {
             actualOperation = operation;
             setLayout(new BorderLayout());
 
-            JPanel formPanel = new JPanel(new GridLayout(6, 2)); // 6 rows, 2 columns
+            JPanel formPanel = new JPanel(new GridLayout(6, 2)); // 6 fileiras, 2 colunas
 
             JLabel idLabel = new JLabel("Id:");
             campoId = new JTextField(15);
@@ -268,7 +260,7 @@ public class GUI {
                 case PESQUISA:
                     leftButton.setText("Submeter Pesquisa");
                     leftButton.setBackground(Color.BLUE);
-                    //-----
+                    
                     Timer timer = new Timer(100, null);
                     ActionListener taskPerformer = new ActionListener() {
                         public void actionPerformed(ActionEvent evt) {
@@ -278,25 +270,24 @@ public class GUI {
                             values[3] = campoNacionalidade.getText();
                             values[4] = campoClube.getText();
                             Register filter = new Register(values);
-                            // Perform your periodic tasks here
+                            // Faz as atividades periodicas aqui
                             filteredPlayersData = interactiveSocket.searchAllFilter(filter);
                             System.out.println("Received filtered players data");
 
-                            // Create a new PlayerDisplay with filtered data
+                            // Cria um novo PlayerDisplay com dados filtrados
                             playerDisplay = new PlayerDisplay(filteredPlayersData, timer);
                             System.out.println("Created PlayerDisplay for filtered players");
 
-                            // Add the PlayerDisplay to cardPanel
+                            // coloca o PlayerDisplay no cardPanel
                             cardPanel.add(playerDisplay, "filtered players");
 
-                            // Show the "filtered players" card in cardPanel
+                            // mostra o card "jogadores filtrados" no cardPanel
                             CardLayout cl = (CardLayout) cardPanel.getLayout();
                             cl.show(cardPanel, "filtered players");
                         }
                     };
                     timer.addActionListener(taskPerformer);
-                    //timer.start();
-                    //-----
+                   
                     leftButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -309,13 +300,6 @@ public class GUI {
                                 values[4] = campoClube.getText();
                                 Register filter = new Register(values);
                                 
-                                /*filteredPlayersData = interactiveSocket.searchAllFilter(filter);
-                                System.out.println("passou de receber os dados da pesquisa");
-                                playerDisplay = new PlayerDisplay(filteredPlayersData);
-                                System.out.println("passou de criar o filtered players");
-                                cardPanel.add(playerDisplay, "filtered players");
-                                CardLayout cl = (CardLayout) (cardPanel.getLayout());
-                                cl.show(cardPanel, "filtered players");*/
                                 timer.start();
                             }
                         }
@@ -323,34 +307,30 @@ public class GUI {
 
                     rightButton.setText("Mostrar Todos");
                     rightButton.setBackground(Color.CYAN);
-                    //-----
+                   
                     Timer timer2 = new Timer(100, null);
                     ActionListener taskPerformer2 = new ActionListener() {
                         public void actionPerformed(ActionEvent evt) {
-                            // Perform your periodic tasks here
+                            // Faz as atividades periódicas
                             allPlayersData = interactiveSocket.searchAll();
                             playerDisplay = new PlayerDisplay(allPlayersData, timer2);
 
-                            // Add the PlayerDisplay to cardPanel
+                            // coloca o PlayerDisplay no cardPanel
                             cardPanel.add(playerDisplay, "filtered players");
 
-                            // Show the "filtered players" card in cardPanel
+                            // mostra o card "jogadores filtrados" no cardPanel
                             CardLayout cl = (CardLayout) cardPanel.getLayout();
                             cl.show(cardPanel, "filtered players");
                         }
                     };
                     timer2.addActionListener(taskPerformer2);
-                    //-----
+                  
                     rightButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de mostrar todos apertado.");
                             if(dataBaseLoaded){
-                                /*allPlayersData = interactiveSocket.searchAll();
-                                playerDisplay = new PlayerDisplay(allPlayersData);
-                                cardPanel.add(playerDisplay, "all players");
-                                CardLayout cl = (CardLayout) (cardPanel.getLayout());
-                                cl.show(cardPanel, "all players");*/
+                                
                                 timer2.start();
                             }
                         }
@@ -366,7 +346,7 @@ public class GUI {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de alterar dados apertado. Ainda nao faz nada");
-                            //apen mandar comando de edicao de dados se ele tiver funcionando. Talvez mostrar uma janelinha antes perguntando se tem certeza
+            
                             int result = JOptionPane.showConfirmDialog(frame,"Tem certeza que quer editar o registro do jogador?", "Confirmar edição",
                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             if(result == JOptionPane.YES_OPTION){
@@ -386,8 +366,7 @@ public class GUI {
                                         JOptionPane.showMessageDialog(null, "Jogador editado com sucesso");
                                         JFrame frameToClose = (JFrame) SwingUtilities.getWindowAncestor((JButton) e.getSource());
                                         frameToClose.dispose();
-                                        //setVisible(false);
-                                        //closePanel();
+                                        
                                     }
                                 }
                             }
@@ -400,7 +379,7 @@ public class GUI {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de deletar jogador apertado. Ainda nao faz nada");
-                            //apen mandar comando de delecao de dados se ele tiver funcionando. Talvez mostrar uma janelinha antes perguntando se tem certeza
+
                             int result = JOptionPane.showConfirmDialog(frame,"Tem certeza que quer apagar o registro do jogador?", "Confirmar deleção",
                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             if(result == JOptionPane.YES_OPTION){
@@ -409,11 +388,10 @@ public class GUI {
                                System.out.println("passou de deletar um jogador");
                                if(funfouRem){
                                 System.out.println("Jogador apagado com sucesso");
-                               //JOptionPane.showMessageDialog(null, "Jogador apagado com sucesso");
+                               
                                 JFrame frameToClose = (JFrame) SwingUtilities.getWindowAncestor((JButton) e.getSource());
                                 frameToClose.dispose();
-                                //setVisible(false);
-                                //closePanel();
+                                
                                }
                             }
                         }

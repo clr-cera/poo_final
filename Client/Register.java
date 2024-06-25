@@ -50,13 +50,13 @@ public class Register {
             this.name = null;
         else
            this.name = str;
-        //------------------------------
+        
         str = values[3];
         if(str.length() == 0)
             this.country = null;
         else
            this.country = str;
-        //----------------------
+        
         str = values[4];
         if(str.length() == 0)
             this.team = null;
@@ -78,7 +78,7 @@ public class Register {
             reg.team = lines[4];
 
             list.addLast(reg);
-            //System.out.println(reg.toRegInput());
+            
         }
 
         return list;
