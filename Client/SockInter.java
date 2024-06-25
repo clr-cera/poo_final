@@ -54,7 +54,7 @@ public class SockInter {
         sendMessage("1 " + csv_path);
         String text = receiveMessage();
         try {
-            float _ = Float.parseFloat(text);
+            float trash = Float.parseFloat(text);
             return true;
         }
         catch (Exception e){
@@ -95,7 +95,7 @@ public class SockInter {
         try {
             text = text.replace("\\n", "\n");
             String[] splitted = text.split("\n");
-            float _ = Float.parseFloat(splitted[0]);
+            float trash = Float.parseFloat(splitted[0]);
             return true;
         }
         catch (Exception e){
@@ -109,7 +109,7 @@ public class SockInter {
         try {
             text = text.replace("\\n", "\n");
             String[] splitted = text.split("\n");
-            float _ = Float.parseFloat(splitted[0]);
+            float trash = Float.parseFloat(splitted[0]);
             return true;
         }
         catch (Exception e){

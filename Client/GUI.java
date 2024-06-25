@@ -1,7 +1,6 @@
 package Client;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -16,9 +15,10 @@ public class GUI {
 
     //polish esses booleano devia ser private e com getter
     public boolean dataBaseLoaded = false;
+    //public boolean inLoop = false;
     public static final char PESQUISA = 0;
     public static final char EDICAO = 1;
-
+    public static final char DELECAO = 2;
 
     public SockInter interactiveSocket;
 
@@ -75,6 +75,35 @@ public class GUI {
                 });
                 menuBar.add(yearItem);
             }
+            JMenuItem show_txt = new JMenuItem("print");
+            show_txt.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dataBaseLoaded = loadData("dado1.csv");
+                    StringBuilder massiveFuckingString = new StringBuilder();
+                    LinkedList<Register> allPlayersData = interactiveSocket.searchAll();
+                    Iterator<Register> it = allPlayersData.iterator();
+                    Register temp;
+                    while (it.hasNext()) {
+                        temp = it.next();
+                        massiveFuckingString.append(temp.toString()).append("\n");
+                    }
+
+                    JTextArea textArea = new JTextArea(massiveFuckingString.toString());
+                    textArea.setEditable(false);  // Make the text area non-editable
+                    textArea.setLineWrap(true);   // Enable line wrapping
+                    textArea.setWrapStyleWord(true);  // Wrap at word boundaries
+
+                    JScrollPane scrollPane = new JScrollPane(textArea);
+
+                    JFrame frame = new JFrame("Text Display");
+                    frame.setSize(900, 700);
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.add(scrollPane, BorderLayout.CENTER);
+                    frame.setVisible(true);
+                }
+            });
+
+            menuBar.add(show_txt);
         }
 
         public JMenuBar getMenuBar() {
@@ -113,9 +142,19 @@ public class GUI {
             return (Register) this.players.get(id);
         }
 
-        public PlayerDisplay(LinkedList<Register> players){
-            this.players = players;
+        public PlayerDisplay(LinkedList<Register> players, Timer timer){
             auxiliarWindow = new JFrame();
+            /*ActionListener taskPerformer = new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    System.out.println("refresh");
+                }
+            };
+            new Timer(100, taskPerformer).start();*/
+            render(players, timer);
+        }
+
+        private void render(LinkedList<Register> players, Timer timer){
+            this.players = players;
             JPanel scrollable = new JPanel();
             scrollable.setLayout(new BoxLayout(scrollable, BoxLayout.Y_AXIS));
             Iterator it = this.players.iterator();
@@ -130,8 +169,16 @@ public class GUI {
                 public void actionPerformed(ActionEvent e){
                     if(!auxiliarWindow.isShowing()){
                         auxiliarWindow.setSize(900, 540);
-                        auxiliarWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+                        //auxiliarWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        auxiliarWindow.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                // Perform action in the parent frame when child frame is closing
+                                System.out.println("Child frame is closing. Perform action in parent frame.");
+                                // For example, change the parent frame's title
+                                //parentFrame.setTitle("Child Frame Closed");
+                            }
+                        });
                         int playerLLId = ((PlayerButton) e.getSource()).getLLIndex();
                         Register playerTemp = displayGetRegister(playerLLId);
                         //System.out.println(playerTemp.toString());
@@ -155,6 +202,7 @@ public class GUI {
             goBackButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e){
+                    timer.stop();
                     CardLayout cl = (CardLayout) (cardPanel.getLayout());
                     cl.show(cardPanel, "input panel");
                 }
@@ -173,6 +221,9 @@ public class GUI {
         private JTextField campoNome;
         private JTextField campoNacionalidade;
         private JTextField campoClube;
+        LinkedList<Register> filteredPlayersData = null;
+        Register filter = null;
+        LinkedList<Register> allPlayersData = null;
 
         private JLabel typeLabel;
 
@@ -180,30 +231,7 @@ public class GUI {
 
         private int actualOperation;//porque java nao me deixa fazer uma maquina de estados simples sem ser um pe no saco
 
-        public int isInteger(String str) {
-            if (str == null) {
-                return -1;
-            }
-            int length = str.length();
-            if (length == 0) {
-                return -1;
-            }
-            int i = 0;
-            if (str.charAt(0) == '-') {
-                if (length == 1) {
-                    return -1;
-                }
-                i = 1;
-            }
-            for (; i < length; i++) {
-                char c = str.charAt(i);
-                if (c < '0' || c > '9') {
-                    return -1;
-                }
-            }
-            return Integer.valueOf(str);
-        }
-
+        //TODO: mudar de receber um array de strings pra receber um Register vazio
         public InputPanel(String[] values, char operation) {
             actualOperation = operation;
             setLayout(new BorderLayout());
@@ -240,60 +268,90 @@ public class GUI {
                 case PESQUISA:
                     leftButton.setText("Submeter Pesquisa");
                     leftButton.setBackground(Color.BLUE);
+                    //-----
+                    Timer timer = new Timer(100, null);
+                    ActionListener taskPerformer = new ActionListener() {
+                        public void actionPerformed(ActionEvent evt) {
+                            values[0] = campoId.getText();
+                            values[1] = campoIdade.getText();
+                            values[2] = campoNome.getText();
+                            values[3] = campoNacionalidade.getText();
+                            values[4] = campoClube.getText();
+                            Register filter = new Register(values);
+                            // Perform your periodic tasks here
+                            filteredPlayersData = interactiveSocket.searchAllFilter(filter);
+                            System.out.println("Received filtered players data");
+
+                            // Create a new PlayerDisplay with filtered data
+                            playerDisplay = new PlayerDisplay(filteredPlayersData, timer);
+                            System.out.println("Created PlayerDisplay for filtered players");
+
+                            // Add the PlayerDisplay to cardPanel
+                            cardPanel.add(playerDisplay, "filtered players");
+
+                            // Show the "filtered players" card in cardPanel
+                            CardLayout cl = (CardLayout) cardPanel.getLayout();
+                            cl.show(cardPanel, "filtered players");
+                        }
+                    };
+                    timer.addActionListener(taskPerformer);
+                    //timer.start();
+                    //-----
                     leftButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de busca apertado.");
                             if(dataBaseLoaded){
-                                Register filter = new Register();
-                                filter.id = isInteger(campoId.getText());
-                                filter.age = isInteger(campoIdade.getText());
-                                String str = "";
-                                str = campoNome.getText();
-                                if(str.length() == 0)
-                                    filter.name = null;
-                                else
-                                   filter.name = str;
-                                //------------------------------
-                                str = campoNacionalidade.getText();
-                                if(str.length() == 0)
-                                    filter.country = null;
-                                else
-                                   filter.country = str;
-                                //----------------------
-                                str = campoClube.getText();
-                                if(str.length() == 0)
-                                    filter.team = null;
-                                else
-                                   filter.team = str;
-                                System.out.println("passou de criar o filter");
-                                //System.out.println(filter.toString());
-                                //System.out.println(filter.toFilter());
+                                values[0] = campoId.getText();
+                                values[1] = campoIdade.getText();
+                                values[2] = campoNome.getText();
+                                values[3] = campoNacionalidade.getText();
+                                values[4] = campoClube.getText();
+                                Register filter = new Register(values);
                                 
-                                //apen fazer a busca de jogadores funcionar
-                                LinkedList<Register> filteredPlayersData = interactiveSocket.searchAllFilter(filter);
+                                /*filteredPlayersData = interactiveSocket.searchAllFilter(filter);
                                 System.out.println("passou de receber os dados da pesquisa");
                                 playerDisplay = new PlayerDisplay(filteredPlayersData);
                                 System.out.println("passou de criar o filtered players");
                                 cardPanel.add(playerDisplay, "filtered players");
                                 CardLayout cl = (CardLayout) (cardPanel.getLayout());
-                                cl.show(cardPanel, "filtered players");
+                                cl.show(cardPanel, "filtered players");*/
+                                timer.start();
                             }
                         }
                     });
 
                     rightButton.setText("Mostrar Todos");
                     rightButton.setBackground(Color.CYAN);
+                    //-----
+                    Timer timer2 = new Timer(100, null);
+                    ActionListener taskPerformer2 = new ActionListener() {
+                        public void actionPerformed(ActionEvent evt) {
+                            // Perform your periodic tasks here
+                            allPlayersData = interactiveSocket.searchAll();
+                            playerDisplay = new PlayerDisplay(allPlayersData, timer2);
+
+                            // Add the PlayerDisplay to cardPanel
+                            cardPanel.add(playerDisplay, "filtered players");
+
+                            // Show the "filtered players" card in cardPanel
+                            CardLayout cl = (CardLayout) cardPanel.getLayout();
+                            cl.show(cardPanel, "filtered players");
+                        }
+                    };
+                    timer2.addActionListener(taskPerformer2);
+                    //-----
                     rightButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de mostrar todos apertado.");
                             if(dataBaseLoaded){
-                                LinkedList<Register> allPlayersData = interactiveSocket.searchAll();
+                                /*allPlayersData = interactiveSocket.searchAll();
                                 playerDisplay = new PlayerDisplay(allPlayersData);
                                 cardPanel.add(playerDisplay, "all players");
                                 CardLayout cl = (CardLayout) (cardPanel.getLayout());
-                                cl.show(cardPanel, "all players");
+                                cl.show(cardPanel, "all players");*/
+                                timer2.start();
                             }
                         }
                     });
@@ -309,6 +367,30 @@ public class GUI {
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de alterar dados apertado. Ainda nao faz nada");
                             //apen mandar comando de edicao de dados se ele tiver funcionando. Talvez mostrar uma janelinha antes perguntando se tem certeza
+                            int result = JOptionPane.showConfirmDialog(frame,"Tem certeza que quer editar o registro do jogador?", "Confirmar edição",
+                               JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if(result == JOptionPane.YES_OPTION){
+                                Register toEdit = new Register(values);
+                                boolean funfouRemEd = interactiveSocket.remove(toEdit);
+                                System.out.println("passou de deletar um jogador");
+                                if(funfouRemEd){
+                                    JOptionPane.showMessageDialog(null, "Jogador apagado com sucesso");
+                                    values[0] = campoId.getText();
+                                    values[1] = campoIdade.getText();
+                                    values[2] = campoNome.getText();
+                                    values[3] = campoNacionalidade.getText();
+                                    values[4] = campoClube.getText();
+                                    toEdit = new Register(values);
+                                    boolean funfouEd = interactiveSocket.insert(toEdit);
+                                    if(funfouEd){
+                                        JOptionPane.showMessageDialog(null, "Jogador editado com sucesso");
+                                        JFrame frameToClose = (JFrame) SwingUtilities.getWindowAncestor((JButton) e.getSource());
+                                        frameToClose.dispose();
+                                        //setVisible(false);
+                                        //closePanel();
+                                    }
+                                }
+                            }
                         }
                     });
 
@@ -319,6 +401,21 @@ public class GUI {
                         public void actionPerformed(ActionEvent e) {
                             System.out.println("botao de deletar jogador apertado. Ainda nao faz nada");
                             //apen mandar comando de delecao de dados se ele tiver funcionando. Talvez mostrar uma janelinha antes perguntando se tem certeza
+                            int result = JOptionPane.showConfirmDialog(frame,"Tem certeza que quer apagar o registro do jogador?", "Confirmar deleção",
+                               JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if(result == JOptionPane.YES_OPTION){
+                               Register toRemove = new Register(values);
+                               boolean funfouRem = interactiveSocket.remove(toRemove);
+                               System.out.println("passou de deletar um jogador");
+                               if(funfouRem){
+                                System.out.println("Jogador apagado com sucesso");
+                               //JOptionPane.showMessageDialog(null, "Jogador apagado com sucesso");
+                                JFrame frameToClose = (JFrame) SwingUtilities.getWindowAncestor((JButton) e.getSource());
+                                frameToClose.dispose();
+                                //setVisible(false);
+                                //closePanel();
+                               }
+                            }
                         }
                     });
 
@@ -350,6 +447,9 @@ public class GUI {
             add(formPanel, BorderLayout.CENTER);
         }
 
-        //private boolean searchFile(){}
+        private void closePanel(){
+            Window win = SwingUtilities.getWindowAncestor(this);
+            win.dispose();
+        }
     }
 }

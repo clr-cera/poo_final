@@ -17,6 +17,53 @@ public class Register {
         this.team = null;
     }
 
+    public int isInteger(String str) {
+        if (str == null) {
+            return -1;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return -1;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return -1;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return -1;
+            }
+        }
+        return Integer.valueOf(str);
+    }
+
+    Register(String[] values) {
+        this.id = isInteger(values[0]);
+        this.age = isInteger(values[1]);
+        String str = "";
+        str = values[2];
+        if(str.length() == 0)
+            this.name = null;
+        else
+           this.name = str;
+        //------------------------------
+        str = values[3];
+        if(str.length() == 0)
+            this.country = null;
+        else
+           this.country = str;
+        //----------------------
+        str = values[4];
+        if(str.length() == 0)
+            this.team = null;
+        else
+           this.team = str;
+    }
+
     public static LinkedList<Register> readMultipleRegisters(String string) {
         LinkedList<Register> list = new LinkedList<Register>();
 
